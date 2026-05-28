@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Claude Signal Lamp</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: transparent;
+      -webkit-app-region: drag;
+      user-select: none;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .lamp-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding: 8px;
+      background: rgba(40, 40, 40, 0.85);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      -webkit-app-region: drag;
+      width: fit-content;
+    }
+
+    .lamp-container.horizontal {
+      flex-direction: row;
+    }
+
+    .lamp {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      -webkit-app-region: drag;
+    }
+
+    .lamp.red {
+      background: radial-gradient(circle at 30% 30%, #666, #333);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .lamp.red.active {
+      background: radial-gradient(circle at 30% 30%, #ff6b6b, #ee0000);
+      box-shadow: 0 0 20px rgba(238, 0, 0, 0.6);
+      animation: blink 1.2s infinite;
+    }
+
+    .lamp.yellow {
+      background: radial-gradient(circle at 30% 30%, #666, #333);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .lamp.yellow.active {
+      background: radial-gradient(circle at 30% 30%, #ffd93d, #ffcc00);
+      box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+    }
+
+    .lamp.green {
+      background: radial-gradient(circle at 30% 30%, #666, #333);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .lamp.green.active {
+      background: radial-gradient(circle at 30% 30%, #6bff6b, #00cc00);
+      box-shadow: 0 0 20px rgba(0, 204, 0, 0.6);
+    }
+
+    /* 闪烁动画 */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .lamp.blink {
+      animation: blink 1s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="lamp-container">
+    <div class="lamp red" id="red-lamp" title="错误/中断"></div>
+    <div class="lamp yellow" id="yellow-lamp" title="处理中"></div>
+    <div class="lamp green active" id="green-lamp" title="空闲"></div>
+  </div>
+
+  <script>
+    // 检查是否在 Electron 环境中
+    let ipcRenderer = null
+    try {
+      if (typeof require !== 'undefined') {
+        ipcRenderer = require('electron').ipcRenderer
+      }
+    } catch (e) {
+      // 浏览器环境，ipcRenderer 为 null
+    }
+
+    const redLamp = document.getElementById('red-lamp')
+    const yellowLamp = document.getElementById('yellow-lamp')
+    const greenLamp = document.getElementById('green-lamp')
+
+    // 状态枚举
+    const STATUS = {
+      IDLE: 'idle',
+      PROCESSING: 'processing',
+      ERROR: 'error',
+      CONFIRM: 'confirm'
+    }
+
+    let currentStatus = STATUS.IDLE
+
+    // 更新灯的状态
+    function updateStatus(status, message = '') {
+      // 清除所有活动状态
+      redLamp.classList.remove('active', 'blink')
+      yellowLamp.classList.remove('active', 'blink')
+      greenLamp.classList.remove('active', 'blink')
+
+      currentStatus = status
+
+      switch (status) {
+        case STATUS.IDLE:
+          greenLamp.classList.add('active')
+          break
+        case STATUS.PROCESSING:
+          yellowLamp.classList.add('active')
+          break
+        case STATUS.ERROR:
+          redLamp.classList.add('active')
+          break
+        case STATUS.CONFIRM:
+          redLamp.classList.add('active', 'blink')
+          break
+      }
+
+      // 通知主进程（仅在 Electron 环境中）
+      if (ipcRenderer) {
+        ipcRenderer.send('update-status', status)
+      }
+    }
+
+    // 暴露给外部调用（用于状态检测）
+    window.updateLampStatus = updateStatus
+    window.STATUS = STATUS
+
+    // 监听来自主进程的状态更新（仅在 Electron 环境中）
+    if (ipcRenderer) {
+      ipcRenderer.on('status-update', (event, data) => {
+        updateStatus(data.status, data.message)
+      })
+
+      // 监听布局切换
+      ipcRenderer.on('toggle-layout', (event, orientation) => {
+        const container = document.querySelector('.lamp-container')
+        if (orientation === 'horizontal') {
+          container.classList.add('horizontal')
+        } else {
+          container.classList.remove('horizontal')
+        }
+      })
+    }
+  </script>
+</body>
+</html>

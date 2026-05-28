@@ -1,0 +1,18 @@
+{
+  "name": "claude-signal-lamp",
+  "version": "1.0.0",
+  "description": "Desktop floating traffic light for Claude Code status",
+  "main": "main.cjs",
+  "type": "module",
+  "scripts": {
+    "start": "electron .",
+    "bridge": "node tcp-bridge.mjs",
+    "light": "node hook-client.mjs"
+  },
+  "keywords": ["electron", "claude-code", "status", "traffic-light"],
+  "author": "sky",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0"
+  }
+}
