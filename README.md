@@ -1,6 +1,6 @@
 # Claude Signal Lamp
 
-桌面悬浮红绿灯，实时指示 Claude Code 的工作状态。
+适用于 Win 11 ClaudeCode Cli 的桌面悬浮红绿灯，实时指示 Claude Code 的工作状态。
 
 ## 功能
 
