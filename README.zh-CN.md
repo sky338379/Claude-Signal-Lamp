@@ -188,7 +188,8 @@ signal-lamp/
 
 ## 已知问题
 
-- 空闲约一分钟后会触发 Notification hook，导致红灯闪烁（Claude Code 行为）
+- **红灯延迟**：弹出权限确认框后，红灯大约有 5 秒延迟才会亮起。这是因为 Claude Code 的 Notification hook 触发时机导致的，我们无法控制。
+- **空闲触发红灯**：空闲约一分钟后会触发 Notification hook，导致红灯闪烁（Claude Code 行为）。
 
 ## 许可证
 
