@@ -188,7 +188,8 @@ signal-lamp/
 
 ## Known Issues
 
-- Idle for ~1 min triggers Notification hook, causing red light to flash (Claude Code behavior)
+- **Red light delay**: When a permission confirmation dialog appears, there is a ~5 second delay before the red light turns on. This is due to Claude Code's Notification hook triggering timing, which we cannot control.
+- **Idle triggers red light**: Idle for ~1 min triggers Notification hook, causing red light to flash (Claude Code behavior).
 
 ## License
 
