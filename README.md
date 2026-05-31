@@ -34,7 +34,7 @@ This will automatically install the Electron dependency (~100MB on first run).
 
 ### Project Setup
 
-Download or clone the entire project folder to your computer.
+- Download or clone the entire project folder to your computer.
 
 ## Usage
 
